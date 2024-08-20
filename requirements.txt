@@ -7,3 +7,6 @@ numpy
 groq
 PyMuPDF
 gunicorn
+python-dotenv
+langchain-groq
+langchain-core
