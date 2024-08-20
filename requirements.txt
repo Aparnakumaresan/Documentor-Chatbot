@@ -5,3 +5,5 @@ langchain-google-genai==0.1.3
 google-cloud==0.34.0
 FAISS==1.7.3
 numpy==1.24.2
+llama
+groq
