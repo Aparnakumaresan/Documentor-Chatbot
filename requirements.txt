@@ -5,4 +5,5 @@ langchain-google-genai
 faiss-cpu
 numpy
 groq
+PyMuPDF
 gunicorn
