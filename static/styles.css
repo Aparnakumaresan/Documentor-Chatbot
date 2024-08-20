@@ -1,0 +1,120 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f3efef;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    color: #0c0c0c;
+    
+}
+
+.sidebar {
+    width: 20%;
+    background-color: #2f2626;
+    color: #fcfafa;
+    padding: 20px;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+}
+
+.sidebar nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar nav ul li {
+    margin: 10px 0;
+}
+
+.sidebar nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+
+.content {
+    flex: 1; /* Allow content to grow */
+    padding: 20px;
+    overflow: hidden; /* Prevent extra scrollbars */
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+}
+
+h1 {
+    color: #0f0f0f;
+}
+
+.upload-section {
+    background: #0f0c0c;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#status {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+#file-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#file-list li {
+    margin: 5px 0;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #28a745;
+    color: #0e0e0e;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #08138e;
+}
+
+.message {
+    background-color: #fff;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.chat-container {
+    flex: 1; /* Allow chat history to grow */
+    overflow-y: auto; /* Enable vertical scrolling */
+    margin-bottom: 20px; /* Space for input box */
+}
+
+.query-form {
+    margin-top: auto; /* Push form to the bottom */
+    background-color: #c8faee; /* Background color for the form */
+    padding: 10px; /* Padding around the form */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Shadow effect */
+}
+
+.scrollable {
+    max-height: calc(100vh - 150px); /* Adjust this value based on your layout */
+    overflow-y: auto;
+}

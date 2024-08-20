@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Clone Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Menu:</h2>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('upload_files') }}">Upload PDF Files</a></li>
+                    <li><a href="{{ url_for('query_page') }}">Start New Conversation</a></li>
+                    <li>
+                        <a href="#" id="view-conversations-link">View Conversations</a>
+                        <div id="dropdown-menu" style="display: none;">
+                            <select id="conversation-dropdown">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                            <button id="load-conversation">Load Conversation</button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <!-- Content goes here -->
+    </div>
+
+    <script>
+        document.getElementById('view-conversations-link').addEventListener('click', async function() {
+            const dropdown = document.getElementById('dropdown-menu');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+
+            if (dropdown.style.display === 'block') {
+                // Fetch the list of conversations
+                const response = await fetch('/conversations');
+                const result = await response.json();
+                const dropdownList = document.getElementById('conversation-dropdown');
+                dropdownList.innerHTML = '';  // Clear existing options
+
+                result.conversations.forEach(convoId => {
+                    const option = document.createElement('option');
+                    option.value = convoId;
+                    option.textContent = `Conversation ${convoId}`;
+                    dropdownList.appendChild(option);
+                });
+            }
+        });
+
+        document.getElementById('load-conversation').addEventListener('click', function() {
+            const conversationId = document.getElementById('conversation-dropdown').value;
+            if (conversationId) {
+                window.location.href = `/view_conversation/${conversationId}`;
+            }
+        });
+    </script>
+</body>
+</html>

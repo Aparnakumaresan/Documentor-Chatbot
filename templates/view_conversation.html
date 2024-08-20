@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Conversations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Menu:</h2>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('upload_files') }}">Upload PDF Files</a></li>
+                    <li><a href="{{ url_for('query_page') }}">Ask Query</a></li>
+                    <li><a href="{{ url_for('view_conversations') }}">View Conversations</a></li>
+                </ul>
+            </nav>
+            <button id="new-conversation-btn" class="new-conversation-button">New Conversation</button>
+
+            <div class="conversation-list">
+                <h3>Previous Conversations</h3>
+                <select id="conversation-dropdown" class="dropdown">
+                    <option value="">Select a conversation...</option>
+                    {% for conversation_id in previous_conversations %}
+                        <option value="{{ conversation_id }}">{{ conversation_id }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </aside>
+        <main class="content">
+            <h1>View Conversations</h1>
+            <div class="chat-container">
+                <h2>Conversation History</h2>
+                <div id="conversation-history" class="scrollable">
+                    <!-- Conversation history for the selected conversation will be inserted here -->
+                    {% for entry in chat_history %}
+                        <div class="message">
+                            <p><strong>Q:</strong> {{ entry['question'] }}</p>
+                            <p><strong>A:</strong> {{ entry['response'] }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('conversation-dropdown').addEventListener('change', function() {
+            const conversationId = this.value;
+            if (conversationId) {
+                window.location.href = `/view_conversation/${conversationId}`;
+            }
+        });
+
+        document.getElementById('new-conversation-btn').addEventListener('click', async function() {
+            const response = await fetch('/start_new_conversation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const result = await response.json();
+            if (result.message === "New conversation started") {
+                window.location.href = '/query_page';  // Redirect to the query page
+            } else {
+                alert('Failed to start a new conversation');
+            }
+        });
+    </script>
+</body>
+</html>

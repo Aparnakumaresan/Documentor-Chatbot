@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Files</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body background="static\bot.jpg">
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Menu:</h2>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('upload_files') }}">Upload PDF Files</a></li>
+                    <li><a href="{{ url_for('query_page') }}" id="start-new-conversation">Ask Query</a></li>
+                    <li><a href="{{ url_for('view_conversations') }}">View Conversations</a></li>
+                </ul>
+            </nav>
+            <button id="new-conversation-btn" class="new-conversation-button">New Conversation</button>
+
+        </aside>
+        <main class="content">
+            <h4>Upload your PDF Files</h4><br>
+            <form id="upload-form" enctype="multipart/form-data" method="post">
+                <input type="file" id="file-input" name="files" multiple><br>
+                <button type="submit">Submit & Process</button>
+            </form>
+            <button id="delete-all-files">Delete All Files</button>
+            <div id="status"></div>
+            <div id="file-list">
+                <h4>Uploaded Files:</h4>
+                <ul id="uploaded-files">
+                    <!-- Uploaded files will be listed here -->
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData();
+            const files = document.getElementById('file-input').files;
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+
+            const response = await fetch('/upload_files', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const result = await response.json();
+            if (result.error) {
+                document.getElementById('status').innerText = result.error;
+                document.getElementById('status').style.color = "red";
+            } else {
+                document.getElementById('status').innerText = result.message;
+                document.getElementById('status').style.color = "green";
+                updateFileList(result.file_ids);
+                // Notify the user that files were uploaded and ask them to manually navigate to the "Start New Conversation" page
+                alert("Files uploaded successfully. Click on 'Start New Conversation' to begin.");
+            }
+        });
+
+        async function deleteFile(file_id) {
+            const response = await fetch(`/cancel/${file_id}`, {
+                method: 'DELETE',
+            });
+
+            const result = await response.json();
+            if (result.error) {
+                alert(result.error);
+            } else {
+                alert(result.message);
+                document.getElementById(`file-${file_id}`).remove();
+            }
+        }
+
+        document.getElementById('delete-all-files').addEventListener('click', async function() {
+            const response = await fetch('/delete_all_files', {
+                method: 'DELETE',
+            });
+
+            const result = await response.json();
+            if (result.error) {
+                alert(result.error);
+            } else {
+                alert(result.message);
+                document.getElementById('uploaded-files').innerHTML = '';  // Clear the list
+            }
+        });
+
+        function updateFileList(file_ids) {
+            const fileList = document.getElementById('uploaded-files');
+            fileList.innerHTML = '';  // Clear existing list
+            file_ids.forEach(file_id => {
+                const li = document.createElement('li');
+                li.id = `file-${file_id}`;
+                li.innerHTML = `
+                    File ID: ${file_id}
+                    <button onclick="deleteFile('${file_id}')" style="color:red; border:none; background:none; cursor:pointer;">&times;</button>
+                `;
+                fileList.appendChild(li);
+            });
+        }
+        document.getElementById('new-conversation-btn').addEventListener('click', async function() {
+    const response = await fetch('/start_new_conversation', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
+
+    const result = await response.json();
+    if (result.message === "New conversation started") {
+        document.getElementById('conversation-history').innerHTML = '';  // Clear conversation history
+        document.getElementById('question').value = '';  // Clear the input box
+    } else {
+        alert('Failed to start a new conversation');
+    }
+});
+
+    </script>
+</body>
+</html>

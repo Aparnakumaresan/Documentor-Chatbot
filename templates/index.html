@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Upload and Chat</title>
+</head>
+<body>
+    <h1>Upload PDF Files</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="files" name="files" multiple>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Uploaded Files</h2>
+    <ul id="fileList"></ul>
+
+    <h2>Ask a Question</h2>
+    <form id="queryForm">
+        <textarea id="question" name="question" placeholder="Type your question here..."></textarea>
+        <button type="submit">Ask</button>
+    </form>
+
+    <h3>Response</h3>
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData();
+            const files = document.getElementById('files').files;
+
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.file_ids) {
+                    data.file_ids.forEach(file_id => {
+                        const li = document.createElement('li');
+                        li.textContent = file_id;
+                        li.setAttribute('data-id', file_id);
+                        li.innerHTML += ` <button onclick="cancelFile('${file_id}')">Cancel</button>`;
+                        document.getElementById('fileList').appendChild(li);
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        function cancelFile(file_id) {
+            fetch(`/cancel/${file_id}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    const fileListItem = document.querySelector(`[data-id='${file_id}']`);
+                    fileListItem.remove();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        document.getElementById('queryForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const question = document.getElementById('question').value;
+
+            fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: question }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.response) {
+                    document.getElementById('response').textContent = data.response;
+                } else if (data.error) {
+                    document.getElementById('response').textContent = `Error: ${data.error}`;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

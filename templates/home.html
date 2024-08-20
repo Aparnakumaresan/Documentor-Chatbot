@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Clone Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body background="static\bot.jpg">
+    <div class="container" >
+        <aside class="sidebar">
+            <h2>Menu:</h2>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('upload_files_page') }}">Upload PDF Files</a></li>
+                    <li><a href="{{ url_for('query_page') }}">Ask Query</a></li>
+                    <li><a href="#" id="view-conversations-link">View Conversations</a></li>
+                </ul>
+            </nav>
+            <button id="new-conversation-btn" class="new-conversation-button">New Conversation</button>
+
+        </aside>
+        <main class="content">
+            <h1>Welcome to the AI Clone Chatbot 🤖</h1>
+            <p>Upload your PDF files and start asking questions!</p>
+
+            <div id="view-conversations-container" style="display: none;">
+                <h2>View Conversations</h2>
+                <select id="conversation-dropdown">
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+                <button id="load-conversation">Load Conversation</button>
+            </div>
+
+            <div id="conversation-display" style="display: none;">
+                <h2>Conversation History</h2>
+                <div id="conversation-history">
+                    <!-- Conversation history will be inserted here -->
+                </div>
+
+                <h2>Ask a Question</h2>
+                <form id="query-form">
+                    <label for="question">Ask a Question from the PDF Files</label>
+                    <input type="text" id="question" name="question" placeholder="Enter your question" required>
+                    <button type="submit">Submit Query</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('view-conversations-link').addEventListener('click', async function() {
+            const container = document.getElementById('view-conversations-container');
+            container.style.display = 'block';
+
+            // Fetch the list of conversations
+            const response = await fetch('/conversations');
+            const result = await response.json();
+
+            const dropdown = document.getElementById('conversation-dropdown');
+            dropdown.innerHTML = '';  // Clear existing options
+
+            result.conversations.forEach(convoId => {
+                const option = document.createElement('option');
+                option.value = convoId;
+                option.textContent = convoId;
+                dropdown.appendChild(option);
+            });
+        });
+
+        document.getElementById('load-conversation').addEventListener('click', async function() {
+            const conversationId = document.getElementById('conversation-dropdown').value;
+            if (!conversationId) return;
+
+            // Fetch the selected conversation history
+            const response = await fetch(`/conversation/${conversationId}`);
+            const result = await response.json();
+
+            const historyContainer = document.getElementById('conversation-history');
+            historyContainer.innerHTML = '';  // Clear existing history
+
+            result.forEach(entry => {
+                const newEntry = document.createElement('div');
+                newEntry.classList.add('message');
+                newEntry.innerHTML = `
+                    <p><strong>Q:</strong> ${entry.question}</p>
+                    <p><strong>A:</strong> ${entry.response}</p>
+                `;
+                historyContainer.appendChild(newEntry);
+            });
+
+            document.getElementById('conversation-display').style.display = 'block';
+        });
+
+        document.getElementById('query-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const question = document.getElementById('question').value;
+
+            const response = await fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: question })
+            });
+
+            const result = await response.json();
+            if (result.error) {
+                alert(result.error);
+            } else {
+                const historyContainer = document.getElementById('conversation-history');
+                const newEntry = document.createElement('div');
+                newEntry.classList.add('message');
+                newEntry.innerHTML = `
+                    <p><strong>Q:</strong> ${question}</p>
+                    <p><strong>A:</strong> ${result.response}</p>
+                `;
+                historyContainer.appendChild(newEntry);
+                document.getElementById('question').value = '';  // Clear the input box
+            }
+        });
+        document.getElementById('new-conversation-btn').addEventListener('click', async function() {
+    const response = await fetch('/start_new_conversation', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
+
+    const result = await response.json();
+    if (result.message === "New conversation started") {
+        document.getElementById('conversation-history').innerHTML = '';  // Clear conversation history
+        document.getElementById('question').value = '';  // Clear the input box
+    } else {
+        alert('Failed to start a new conversation');
+    }
+});
+
+    </script>
+</body>
+</html>

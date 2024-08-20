@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask Query</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Menu:</h2>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('upload_files') }}">Upload PDF Files</a></li>
+                    <li><a href="{{ url_for('query_page') }}">Ask Query</a></li>
+                    <li><a href="{{ url_for('view_conversations') }}">View Conversations</a></li>
+                </ul>
+            </nav>
+            <button id="new-conversation-btn" class="new-conversation-button">New Conversation</button>
+        </aside>
+        <main class="content">
+            <h1>AI Clone Chatbot 🤖</h1>
+            <div class="chat-container">
+                <h2>Conversation History</h2>
+                <div id="conversation-history" class="scrollable">
+                    <!-- Current conversation history will be inserted here -->
+                    {% for entry in chat_history %}
+                        <div class="message">
+                            <p><strong>Q:</strong> {{ entry['question'] }}</p>
+                            <p><strong>A:</strong> {{ entry['response'] }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="query-form">
+                <h2>Ask a Question</h2>
+                <form id="query-form">
+                    <label for="question">Ask a Question from the PDF Files</label>
+                    <input type="text" id="question" name="question" placeholder="Enter your question" required>
+                    <button type="submit">Submit Query</button>
+                </form>
+                <button id="clear-history" class="delete-button">Clear History</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('query-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const question = document.getElementById('question').value;
+
+            const response = await fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: question })
+            });
+
+            const result = await response.json();
+            if (result.error) {
+                alert(result.error);
+            } else {
+                const historyContainer = document.getElementById('conversation-history');
+                const newEntry = document.createElement('div');
+                newEntry.classList.add('message');
+                newEntry.innerHTML = 
+                    `<p><strong>Q:</strong> ${question}</p>
+                    <p><strong>A:</strong> ${result.response}</p>`
+                ;
+                historyContainer.appendChild(newEntry);
+                document.getElementById('question').value = '';  // Clear the input box
+
+                // Scroll to the bottom of the conversation history
+                historyContainer.scrollTop = historyContainer.scrollHeight;
+            }
+        });
+
+        document.getElementById('clear-history').addEventListener('click', async function() {
+            const response = await fetch('/clear_history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const result = await response.json();
+            if (result.message === "Chat history cleared") {
+                document.getElementById('conversation-history').innerHTML = '';
+            } else {
+                alert('Failed to clear history');
+            }
+        });
+
+        document.getElementById('new-conversation-btn').addEventListener('click', async function() {
+            const response = await fetch('/start_new_conversation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const result = await response.json();
+            if (result.message === "New conversation started") {
+                document.getElementById('conversation-history').innerHTML = '';  // Clear the conversation history
+            } else {
+                alert('Failed to start a new conversation');
+            }
+        });
+    </script>
+</body>
+</html>
