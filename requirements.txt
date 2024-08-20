@@ -1,9 +1,9 @@
-Flask==2.2.0
-PyPDF2==1.26.0
-langchain==0.0.1
-langchain-google-genai==1.0.9
-faiss-cpu==1.7.0
-numpy==1.24.0
+Flask
+PyPDF2
+langchain
+langchain-google-genai
+faiss-cpu
+numpy
 llama
-groq==0.9.0
-gunicorn==23.0.0
+groq
+gunicorn
