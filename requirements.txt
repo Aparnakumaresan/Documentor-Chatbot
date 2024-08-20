@@ -4,6 +4,5 @@ langchain
 langchain-google-genai
 faiss-cpu
 numpy
-llama
 groq
 gunicorn
