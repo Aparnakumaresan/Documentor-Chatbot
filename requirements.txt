@@ -1,3 +1,4 @@
+--upgrade setuptools wheel 
 Flask
 PyPDF2
 langchain
