@@ -11,3 +11,4 @@ python-dotenv
 langchain-groq
 langchain-core
 grpcio
+langchain-community
