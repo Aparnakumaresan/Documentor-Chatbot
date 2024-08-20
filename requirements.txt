@@ -2,7 +2,7 @@ Flask
 PyPDF2
 langchain
 langchain-google-genai
-FAISS
+faiss-cpu
 numpy
 llama
 groq
