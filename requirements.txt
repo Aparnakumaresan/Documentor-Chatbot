@@ -1,4 +1,3 @@
-wheel
 setuptools
 Flask
 PyPDF2
