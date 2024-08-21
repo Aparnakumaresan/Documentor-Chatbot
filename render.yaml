@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: my-service
-    env: python
-    python_version: 3.10
-    build_command: pip install -r requirements.txt
-    start_command: gunicorn app:app  # Or your specific start command
-    repo: https://github.com/username/repo
