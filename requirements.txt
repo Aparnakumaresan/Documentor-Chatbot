@@ -1,10 +1,14 @@
-wheel
-setuptools
 Flask
 PyPDF2
 langchain
 langchain-google-genai
 faiss-cpu
 numpy
-llama
 groq
+PyMuPDF
+gunicorn
+python-dotenv
+langchain-groq
+langchain-core
+grpcio
+langchain-community
